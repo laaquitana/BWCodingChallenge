@@ -123,9 +123,13 @@ namespace WordRepCounterConsole
             return prefix;
         }
 
-        public void SaveWordCollectionNewFormat(string filepath)
+        public void SaveWordDetailsListNewFormat(string filepath)
         {
-            throw new NotImplementedException();
+            foreach (var wordDetails in WordDetailsList)
+            {
+                string line = $" {wordDetails.Key}. {wordDetails.Value.ToString()}" + Environment.NewLine;
+                File.AppendAllText(filepath, line);
+            }
         }
     }
 }
