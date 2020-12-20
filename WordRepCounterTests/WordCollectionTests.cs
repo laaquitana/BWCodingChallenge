@@ -57,26 +57,39 @@ namespace WordRepCounterTests
         [Test]
         public void WordCollection_LoadArticleTokens_Output()
         {
-            _wordCollection.LoadArticleTokens(_articleFilePath);
+            Assert.IsTrue(_wordCollection.LoadArticleTokens(_articleFilePath, out string message));
             Assert.IsTrue(_wordCollection.ArticleTokens.SequenceEqual(_expectedArticleOutput));
+            string expectedMessage = $"Successfully parsed {_articleFilePath}";
+            Assert.AreEqual(expectedMessage, message);
         }
 
         [Test]
         public void WordCollection_LoadWordsTokens_Output()
         {
-            _wordCollection.LoadWordsTokens(_wordsFilePath);
+            Assert.IsTrue(_wordCollection.LoadWordsTokens(_wordsFilePath, out string message));
             Assert.IsTrue(_wordCollection.WordsTokens.SequenceEqual(_expectedWordsOutput));
+            string expectedMessage = $"Successfully parsed {_wordsFilePath}";
+            Assert.AreEqual(expectedMessage, message);
         }
 
         [Test]
-        public void WordCollection_GenerateTokenizedSentences_Output()
+        public void WordCollection_GenerateTokenizedSentences_OneSentence()
         {
             string expectedSentence = "This is what I learned from Mr. Jones about a paragraph.";
-            _wordCollection.LoadArticleTokens(_articleFilePath);
-            _wordCollection.LoadWordsTokens(_wordsFilePath);
-            _wordCollection.GenerateTokenizedSentences();
+            Assert.IsTrue(_wordCollection.LoadArticleTokens(_articleFilePath, out string message));
+            
+            string expectedMessage = $"Successfully parsed {_articleFilePath}";
+            Assert.AreEqual(expectedMessage, message);
+
+            Assert.IsTrue(_wordCollection.LoadWordsTokens(_wordsFilePath, out message));
+            expectedMessage = $"Successfully parsed {_wordsFilePath}";
+            Assert.AreEqual(expectedMessage, message);
+
+            Assert.IsTrue(_wordCollection.GenerateTokenizedSentences(out message));
             Assert.AreEqual(1, _wordCollection.TokenizedSentences.Count);
             Assert.AreEqual(expectedSentence, _wordCollection.TokenizedSentences.First().ToString());
+            expectedMessage = "Successfully generated tokenized sentences.";
+            Assert.AreEqual(expectedMessage, message);
         }
     }
 }
