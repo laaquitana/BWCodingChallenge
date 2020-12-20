@@ -19,11 +19,20 @@ namespace WordRepCounterConsole
 
             // Call WordCollection to load/generate/save output
             WordCollection wordCollection = new WordCollection();
-            wordCollection.LoadArticleTokens(articlePath);
-            wordCollection.LoadWordsTokens(wordsPath);
+
+            string message;
+
+            if (wordCollection.LoadArticleTokens(articlePath, out message) && wordCollection.LoadWordsTokens(articlePath, out message)) 
+            {
+
+            }
+            else
+            {
+                Console.WriteLine($"ERROR: {message}");
+            }
             wordCollection.GenerateTokenizedSentences();
             wordCollection.GenerateWordsDetailsList();
-            
+            wordCollection.SaveWordDetailsListNewFormat(@"D:\Projects\codingchallenges\BWCodingChallenge\WordRepCounterTests\test_files\test_01\Output.txt");
         }
     }
 }

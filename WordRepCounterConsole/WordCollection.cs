@@ -23,16 +23,48 @@ namespace WordRepCounterConsole
             SetPrefixDictionary();
         }
 
-        public void LoadArticleTokens(string filepath)
+        public bool LoadArticleTokens(string filepath, out string message)
         {
+            // check if exist
+            if (!File.Exists(filepath))
+            {
+                message = $"{filepath} does not exist.";
+                return false;
+            }
+            // check if empty
+            if (new FileInfo(filepath).Length == 0)
+            {
+                message = $"{filepath} is empty";
+                return false;
+            }
+
             string text = File.ReadAllText(filepath);
             ArticleTokens.AddRange(text.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-        }
 
-        public void LoadWordsTokens(string filepath)
+            message = $"Successfully parsed {filepath}";
+            return true;
+        }
+        
+        public bool LoadWordsTokens(string filepath, out string message)
         {
+            // check if exist
+            if (!File.Exists(filepath))
+            {
+                message = $"{filepath} does not exist.";
+                return false;
+            }
+            // check if empty
+            if (new FileInfo(filepath).Length == 0)
+            {
+                message = $"{filepath} is empty";
+                return false;
+            }
+
             string text = File.ReadAllText(filepath);
             WordsTokens.AddRange(text.Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
+
+            message = $"Successfully parsed {filepath}";
+            return true;
         }
 
         public void GenerateTokenizedSentences()
