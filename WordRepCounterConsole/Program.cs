@@ -7,32 +7,61 @@ namespace WordRepCounterConsole
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Hello User!");
+            Console.WriteLine("-----------");
+            
+            Console.Write("Please enter the full path of input file Article.txt: ");
+            string articlePath = Console.ReadLine().Trim(new char[] { '"', ' ' }); 
+            if (!File.Exists(articlePath))
+            {
+                Console.WriteLine($"ERROR: {articlePath} does not exist");
+                return;
+            }
+            
+            Console.Write("Please enter the full path of input file Words.txt: ");
+            string wordsPath = Console.ReadLine().Trim(new char[] { '"', ' ' });
+            if (!File.Exists(wordsPath))
+            {
+                Console.WriteLine($"ERROR: {wordsPath} does not exist");
+                return;
+            }
 
-            // Get Article.txt file path from user
-            // Get Words.txt file path from user
-            // Get output dir from user
-            // hardcoded for now, will update later
-            string projectDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\.."));
-            string articlePath = projectDir + @"\WordRepCounterTests\test_files\test_01\Input\Article.txt";
-            string wordsPath = projectDir + @"\WordRepCounterTests\test_files\test_01\Input\Words.txt";
-
-            // Call WordCollection to load/generate/save output
+            Console.Write("Please enter the output directory: ");
+            string outputDir = Console.ReadLine().Trim(new char[] { '"', ' ' });
+            if (!Directory.Exists(outputDir))
+            {
+                Console.WriteLine($"ERROR: {outputDir} directory does not exist");
+                return;
+            }
+            string outputPath = outputDir + @"\Output.txt";
+            Console.WriteLine(outputDir);
+            
             WordCollection wordCollection = new WordCollection();
-
             string message;
 
-            if (wordCollection.LoadArticleTokens(articlePath, out message) && wordCollection.LoadWordsTokens(articlePath, out message)) 
-            {
-
-            }
-            else
+            if (!(wordCollection.LoadArticleTokens(articlePath, out message) && wordCollection.LoadWordsTokens(wordsPath, out message)))
             {
                 Console.WriteLine($"ERROR: {message}");
+                return;
             }
-            wordCollection.GenerateTokenizedSentences();
-            wordCollection.GenerateWordsDetailsList();
-            wordCollection.SaveWordDetailsListNewFormat(@"D:\Projects\codingchallenges\BWCodingChallenge\WordRepCounterTests\test_files\test_01\Output.txt");
+
+            if (!wordCollection.GenerateTokenizedSentences(out message))
+            {
+                Console.WriteLine($"ERROR: {message}");
+                return;
+            }
+
+            if (!wordCollection.GenerateWordsDetailsList(out message))
+            {
+                Console.WriteLine($"ERROR: {message}");
+                return;
+            }
+
+            if (!wordCollection.SaveWordDetailsListNewFormat(outputPath, out message))
+            {
+                Console.WriteLine($"ERROR: {message}");
+                return;
+            }
         }
     }
 }
