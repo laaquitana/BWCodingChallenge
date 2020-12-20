@@ -11,7 +11,7 @@ namespace WordRepCounterConsole
         public List<string> ArticleTokens { get; private set; }
         public List<string> WordsTokens { get; private set; }
         public List<TokenizedSentence> TokenizedSentences { get; private set; }
-        public Dictionary<string, WordDetails> WordDetailsList { get; private set; }
+        public List<WordDetailsFinalFormat> WordDetailsList { get; private set; }
         public Dictionary<int,char> PrefixDictionary { get; private set; }
 
         public WordCollection()
@@ -19,7 +19,7 @@ namespace WordRepCounterConsole
             ArticleTokens = new List<string>();
             WordsTokens = new List<string>();
             TokenizedSentences = new List<TokenizedSentence>();
-            WordDetailsList = new Dictionary<string, WordDetails>();
+            WordDetailsList = new List<WordDetailsFinalFormat>();
             SetPrefixDictionary();
         }
 
@@ -137,7 +137,7 @@ namespace WordRepCounterConsole
                         }
                     }
                 }
-                WordDetailsList.Add(GeneratePrefix(counter), wordDetails);
+                WordDetailsList.Add(new WordDetailsFinalFormat(GeneratePrefix(counter), wordDetails));
                 counter++;
             }
 
@@ -169,11 +169,13 @@ namespace WordRepCounterConsole
 
         public bool SaveWordDetailsListNewFormat(string filepath, out string message)
         {
+            var lines = new StringBuilder();
             foreach (var wordDetails in WordDetailsList)
             {
-                string line = $" {wordDetails.Key}. {wordDetails.Value.ToString()}" + Environment.NewLine;
-                File.AppendAllText(filepath, line);
+                lines.Append($"{wordDetails.ToString()}" + Environment.NewLine);
             }
+
+            File.WriteAllText(filepath, lines.ToString());
 
             message = "Successfully saved word details list in new format to an output file.";
             return true;
