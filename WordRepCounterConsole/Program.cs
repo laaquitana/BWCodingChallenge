@@ -7,8 +7,7 @@ namespace WordRepCounterConsole
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello User!");
-            Console.WriteLine("-----------");
+            Console.WriteLine("***** Hello User! *****" + Environment.NewLine);
             
             Console.Write("Please enter the full path of input file Article.txt: ");
             string articlePath = Console.ReadLine().Trim(new char[] { '"', ' ' }); 
@@ -61,6 +60,8 @@ namespace WordRepCounterConsole
                 Console.WriteLine($"ERROR: {message}");
                 return;
             }
+
+            Console.WriteLine(Environment.NewLine + $"Success! Please see {outputPath}");
         }
     }
 }
