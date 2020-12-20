@@ -34,7 +34,6 @@ namespace WordRepCounterConsole
                 return;
             }
             string outputPath = outputDir + @"\Output.txt";
-            Console.WriteLine(outputDir);
             
             WordCollection wordCollection = new WordCollection();
             string message;
