@@ -34,7 +34,7 @@ namespace WordRepCounterConsole
             // check if empty
             if (new FileInfo(filepath).Length == 0)
             {
-                message = $"{filepath} is empty";
+                message = $"{filepath} is empty.";
                 return false;
             }
 
@@ -56,7 +56,7 @@ namespace WordRepCounterConsole
             // check if empty
             if (new FileInfo(filepath).Length == 0)
             {
-                message = $"{filepath} is empty";
+                message = $"{filepath} is empty.";
                 return false;
             }
 
@@ -67,70 +67,82 @@ namespace WordRepCounterConsole
             return true;
         }
 
-        public void GenerateTokenizedSentences()
+        public bool GenerateTokenizedSentences(out string message)
         {
-            if (ArticleTokens.Count > 0 && WordsTokens.Count > 0)
+            if (ArticleTokens.Count == 0)
             {
-                List<string> sentenceTokens = new List<string>();
-                int counter = 1;
+                message = $"{ArticleTokens} is empty. Please make sure to load an input text file containing a paragraph first before calling this method.";
+                return false;
+            }
 
-                foreach (var token in ArticleTokens)
+            if (WordsTokens.Count == 0)
+            {
+                message = $"{WordsTokens} is empty. Please make sure to load an input text file containing a list of words first before calling this method.";
+                return false;
+            }
+
+            List<string> sentenceTokens = new List<string>();
+            int counter = 1;
+
+            foreach (var token in ArticleTokens)
+            {
+                sentenceTokens.Add(token);
+                if (token.EndsWith('.'))
                 {
-                    sentenceTokens.Add(token);
-                    if (token.EndsWith('.'))
+                    if (!WordsTokens.Contains(token.ToLower()))
                     {
-                        if (!WordsTokens.Contains(token.ToLower()))
-                        {
-                            string[] temp = sentenceTokens.ToArray();
-                            TokenizedSentences.Add(new TokenizedSentence(counter, temp.ToList()));
-                            sentenceTokens.Clear();
-                            counter++;
-                        }
+                        string[] temp = sentenceTokens.ToArray();
+                        TokenizedSentences.Add(new TokenizedSentence(counter, temp.ToList()));
+                        sentenceTokens.Clear();
+                        counter++;
                     }
                 }
-
-                // End of paragraph has no .
-                /*if (sentenceTokens.Count > 0)
-                {
-                    TokenizedSentences.Add(new TokenizedSentence(counter, sentenceTokens));
-                }*/
             }
+
+            message = "Successfully generated tokenized sentences.";
+            return true;
         }
 
-        public void GenerateWordsDetailsList()
+        public bool GenerateWordsDetailsList(out string message)
         {
-            if (TokenizedSentences.Count > 0)
+            if (TokenizedSentences.Count == 0)
             {
-                int counter = 0;
-                foreach (var token in WordsTokens)
+                message = $"{TokenizedSentences} is empty. Please make sure to generate tokenized sentences after loading input files.";
+                return false;
+            }
+
+            int counter = 0;
+            foreach (var token in WordsTokens)
+            {
+                WordDetails wordDetails = new WordDetails(token);
+                foreach (var sentence in TokenizedSentences)
                 {
-                    WordDetails wordDetails = new WordDetails(token);
-                    foreach (var sentence in TokenizedSentences)
+                    foreach (var word in sentence.SentenceTokens)
                     {
-                        foreach (var word in sentence.SentenceTokens)
+                        string temp;
+
+                        // last word in the sentence has a trailing '.'
+                        if (word.EndsWith('.') && word == sentence.SentenceTokens.Last())
                         {
-                            string temp;
-                            
-                            // last word in the sentence
-                            if (word.EndsWith('.') && word == sentence.SentenceTokens.Last())
-                            {
-                                temp = word.Trim('.').ToLower();
-                            }
-                            else
-                            {
-                                temp = word.Trim(',').ToLower();
-                            }
-                            
-                            if (token == temp)
-                            {
-                                wordDetails.SentenceNumberList.Add(sentence.SequenceNumber);
-                            }
+                            temp = word.Trim('.').ToLower();
+                        }
+                        else
+                        {
+                            temp = word.Trim(',').ToLower();
+                        }
+
+                        if (token == temp)
+                        {
+                            wordDetails.SentenceNumberList.Add(sentence.SequenceNumber);
                         }
                     }
-                    WordDetailsList.Add(GeneratePrefix(counter), wordDetails);
-                    counter++;
                 }
+                WordDetailsList.Add(GeneratePrefix(counter), wordDetails);
+                counter++;
             }
+
+            message = "Successfully generated word details list.";
+            return true;
         }
 
         private void SetPrefixDictionary()
@@ -155,13 +167,16 @@ namespace WordRepCounterConsole
             return prefix;
         }
 
-        public void SaveWordDetailsListNewFormat(string filepath)
+        public bool SaveWordDetailsListNewFormat(string filepath, out string message)
         {
             foreach (var wordDetails in WordDetailsList)
             {
                 string line = $" {wordDetails.Key}. {wordDetails.Value.ToString()}" + Environment.NewLine;
                 File.AppendAllText(filepath, line);
             }
+
+            message = "Successfully saved word details list in new format to an output file.";
+            return true;
         }
     }
 }
